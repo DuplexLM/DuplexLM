@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FD Scenarios — Interactive Demo</title>
+<script src="lib/wavesurfer.min.js"></script>
+<style>
+  :root { color-scheme: light; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 22px;
+    color: #1f2937;
+    background: #fafafa;
+    line-height: 1.55;
+  }
+  h1 { font-size: 24px; margin: 0 0 6px 0; }
+  h2 { font-size: 18px; margin: 28px 0 10px 0; padding-bottom: 4px; border-bottom: 2px solid #e5e7eb; }
+  h3 { font-size: 15px; margin: 0 0 4px 0; }
+  .subtitle { color: #4b5563; font-size: 13px; margin: 0 0 18px 0; }
+  .subtitle b { color: #111827; }
+
+  /* TIR ontology section */
+  .tir-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .tir-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 12px;
+  }
+  .tir-card h4 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tir-card .axis-icon {
+    display: inline-block;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #ecfeff;
+    color: #0e7490;
+    text-align: center;
+    line-height: 26px;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .tir-card.t .axis-icon { background: #dbeafe; color: #1e40af; }
+  .tir-card.i .axis-icon { background: #d1fae5; color: #065f46; }
+  .tir-card.r .axis-icon { background: #fee2e2; color: #991b1b; }
+  .tir-card table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  .tir-card td { padding: 3px 6px; vertical-align: top; }
+  .tir-card td:first-child { font-family: ui-monospace, monospace; color: #6b7280; width: 30px; }
+  .tir-card td b { color: #1f2937; }
+  .tir-note {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    padding: 10px 14px;
+    margin: 16px 0 24px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #78350f;
+  }
+
+  /* Legend + grid */
+  .legend { display: flex; gap: 22px; margin: 6px 0 18px; font-size: 12px; color: #4b5563; }
+  .swatch { display: inline-block; width: 14px; height: 8px; vertical-align: middle; margin-right: 5px; border-radius: 2px; }
+  .sw-l { background: #2563eb; } .sw-r { background: #dc2626; }
+
+  .scn-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .scn-cell {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .scn-thumb { width: 100%; display: block; border-bottom: 1px solid #e5e7eb; }
+  .wf-block { padding: 8px 12px 4px 12px; }
+  .channel-label {
+    font-size: 10px; color: #6b7280;
+    margin: 4px 0 2px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .wf-container {
+    background: #f9fafb;
+    border-radius: 4px;
+    padding: 3px 6px;
+  }
+  .ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px 10px;
+    border-top: 1px solid #e5e7eb;
+    background: #fafafa;
+  }
+  .ctrl button {
+    background: #2563eb; color: #fff;
+    border: none; border-radius: 4px;
+    padding: 5px 14px; font-size: 13px;
+    cursor: pointer; font-weight: 500;
+  }
+  .ctrl button:hover { background: #1d4ed8; }
+  .ctrl button:disabled { background: #9ca3af; cursor: wait; }
+  .ctrl .time {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px; color: #6b7280;
+  }
+</style>
+</head>
+<body>
+
+<h1>Six Canonical Full-Duplex Interaction Scenarios</h1>
+<p class="subtitle">
+  Interactive demo for the <b>T × I × R</b> ontology — each cell shows one
+  canonical scenario as a dual-channel waveform synced to its audio.
+  Click ▶ to play; click any waveform to seek.
+</p>
+
+<h2>📐 Three-axis ontology</h2>
+<p class="subtitle" style="margin-bottom: 14px;">
+  Each conversational micro-event = (<b>T</b>emporal · <b>I</b>ntent · <b>R</b>esponse) triplet.
+  Failure modes localise to specific cells in this 3-axis space, making them
+  diagnosable rather than vague.
+</p>
+
+<div class="tir-wrap">
+  <div class="tir-card t">
+    <h4><span class="axis-icon">T</span> Temporal — <i>when</i></h4>
+    <table>
+      <tr><td>T1</td><td><b>Sequential</b> — 200-1500 ms inter-turn gap</td></tr>
+      <tr><td>T2</td><td><b>Latched</b> — gap < 200 ms</td></tr>
+      <tr><td>T3</td><td><b>Overlap-onset</b> — one party begins while the other is talking</td></tr>
+      <tr><td>T4</td><td><b>Concurrent</b> — both ≥ 1 s sustained overlap</td></tr>
+      <tr><td>T5</td><td><b>Silence</b> — both quiet ≥ 500 ms</td></tr>
+    </table>
+  </div>
+
+  <div class="tir-card i">
+    <h4><span class="axis-icon">I</span> Intent — <i>what for</i></h4>
+    <table>
+      <tr><td>I1</td><td><b>Information</b> — primary content</td></tr>
+      <tr><td>I2</td><td><b>Backchannel</b> — "uh-huh", "嗯", no floor claim</td></tr>
+      <tr><td>I3</td><td><b>Repair</b> — self-correction or clarification</td></tr>
+      <tr><td>I4</td><td><b>Floor-claim</b> — barge-in to take turn</td></tr>
+      <tr><td>I5</td><td><b>Floor-yield</b> — release turn to other party</td></tr>
+      <tr><td>I6</td><td><b>Hesitation</b> — mid-utterance pause, not done</td></tr>
+      <tr><td>I7</td><td><b>Third-party</b> — non-addressed speech / noise</td></tr>
+    </table>
+  </div>
+
+  <div class="tir-card r">
+    <h4><span class="axis-icon">R</span> Response — <i>system action</i></h4>
+    <table>
+      <tr><td>R1</td><td><b>Continue</b> — keep talking</td></tr>
+      <tr><td>R2</td><td><b>Stop & listen</b> — yield within ~200 ms</td></tr>
+      <tr><td>R3</td><td><b>Wait</b> — stay silent, user not finished</td></tr>
+      <tr><td>R4</td><td><b>Acknowledge</b> — emit backchannel only</td></tr>
+      <tr><td>R5</td><td><b>Ignore / filter</b> — drop non-addressed audio</td></tr>
+      <tr><td>R6</td><td><b>Initiate</b> — start a new turn</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="tir-note">
+  <b>Why three axes, not flat categories?</b>
+  The same (Intent, Response) pair has different correctness depending on Temporal context.
+  Example: <code>(I2, R1)</code> = "user backchannel, assistant continues" is <b>correct</b>
+  during <code>T3</code> (overlap-onset) but <b>wrong</b> during <code>T1</code> (sequential turn,
+  where the same "uh-huh" might be the user yielding/closing). Joint <code>T·I·R</code> tagging
+  lets us pin down failure modes that flat 9-class labels (FDB v1.5 / HumDial) cannot.
+</div>
+
+<h2>🎧 Six canonical scenarios</h2>
+<div class="legend">
+  <span><span class="swatch sw-l"></span>Left channel = User / Third-Party</span>
+  <span><span class="swatch sw-r"></span>Right channel = Assistant</span>
+</div>
+
+<div class="scn-grid">
+
+  <div class="scn-cell">
+    <img class="scn-thumb" src="assets/scn1.png" alt="Scenario 1: Standard Turn">
+    <div class="wf-block">
+      <div class="channel-label">User (Left)</div>
+      <div class="wf-container"><div id="wfL-scn1"></div></div>
+      <div class="channel-label">Assistant (Right)</div>
+      <div class="wf-container"><div id="wfR-scn1"></div></div>
+    </div>
+    <div class="ctrl"><button id="btn-scn1" disabled>Loading…</button><span class="time" id="time-scn1">0.00 / 0.00 s</span></div>
+  </div>
+
+  <div class="scn-cell">
+    <img class="scn-thumb" src="assets/scn2.png" alt="Scenario 2: Latched Zero-Gap">
+    <div class="wf-block">
+      <div class="channel-label">User (Left)</div>
+      <div class="wf-container"><div id="wfL-scn2"></div></div>
+      <div class="channel-label">Assistant (Right)</div>
+      <div class="wf-container"><div id="wfR-scn2"></div></div>
+    </div>
+    <div class="ctrl"><button id="btn-scn2" disabled>Loading…</button><span class="time" id="time-scn2">0.00 / 0.00 s</span></div>
+  </div>
+
+  <div class="scn-cell">
+    <img class="scn-thumb" src="assets/scn3.png" alt="Scenario 3: Cooperative Barge-In">
+    <div class="wf-block">
+      <div class="channel-label">User (Left)</div>
+      <div class="wf-container"><div id="wfL-scn3"></div></div>
+      <div class="channel-label">Assistant (Right)</div>
+      <div class="wf-container"><div id="wfR-scn3"></div></div>
+    </div>
+    <div class="ctrl"><button id="btn-scn3" disabled>Loading…</button><span class="time" id="time-scn3">0.00 / 0.00 s</span></div>
+  </div>
+
+  <div class="scn-cell">
+    <img class="scn-thumb" src="assets/scn4.png" alt="Scenario 4: Backchannel">
+    <div class="wf-block">
+      <div class="channel-label">User (Left)</div>
+      <div class="wf-container"><div id="wfL-scn4"></div></div>
+      <div class="channel-label">Assistant (Right)</div>
+      <div class="wf-container"><div id="wfR-scn4"></div></div>
+    </div>
+    <div class="ctrl"><button id="btn-scn4" disabled>Loading…</button><span class="time" id="time-scn4">0.00 / 0.00 s</span></div>
+  </div>
+
+  <div class="scn-cell">
+    <img class="scn-thumb" src="assets/scn5.png" alt="Scenario 5: Third-Party / Noise">
+    <div class="wf-block">
+      <div class="channel-label">3rd-Party (Left)</div>
+      <div class="wf-container"><div id="wfL-scn5"></div></div>
+      <div class="channel-label">Assistant (Right)</div>
+      <div class="wf-container"><div id="wfR-scn5"></div></div>
+    </div>
+    <div class="ctrl"><button id="btn-scn5" disabled>Loading…</button><span class="time" id="time-scn5">0.00 / 0.00 s</span></div>
+  </div>
+
+  <div class="scn-cell">
+    <img class="scn-thumb" src="assets/scn6.png" alt="Scenario 6: Hesitation / Long Silence">
+    <div class="wf-block">
+      <div class="channel-label">User (Left)</div>
+      <div class="wf-container"><div id="wfL-scn6"></div></div>
+      <div class="channel-label">Assistant (Right) — silent</div>
+      <div class="wf-container"><div id="wfR-scn6"></div></div>
+    </div>
+    <div class="ctrl"><button id="btn-scn6" disabled>Loading…</button><span class="time" id="time-scn6">0.00 / 0.00 s</span></div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  const scenarios = [
+    { id: 'scn1', file: 'final/scn1_standard_turn.wav'        },
+    { id: 'scn2', file: 'final/scn2_latched_zero_gap.wav'     },
+    { id: 'scn3', file: 'final/scn3_cooperative_bargein.wav'  },
+    { id: 'scn4', file: 'final/scn4_backchannel.wav'          },
+    { id: 'scn5', file: 'final/scn5_third_party.wav'          },
+    { id: 'scn6', file: 'final/scn6_hesitation_silence.wav'   },
+  ];
+
+  const players = {};
+  window.players = players;
+  const fmt = (t) => (t || 0).toFixed(2);
+
+  function makeMonoWavBlob(samples, sr) {
+    const len = samples.length;
+    const ab = new ArrayBuffer(44 + len * 2);
+    const dv = new DataView(ab);
+    const w = (o, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(o+i, s.charCodeAt(i)); };
+    w(0,'RIFF'); dv.setUint32(4, 36+len*2, true);
+    w(8,'WAVE'); w(12,'fmt ');
+    dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
+    dv.setUint32(24,sr,true); dv.setUint32(28,sr*2,true);
+    dv.setUint16(32,2,true); dv.setUint16(34,16,true);
+    w(36,'data'); dv.setUint32(40,len*2,true);
+    let o=44;
+    for (let i=0; i<len; i++, o+=2) {
+      let v = Math.max(-1, Math.min(1, samples[i]));
+      dv.setInt16(o, v<0 ? v*0x8000 : v*0x7FFF, true);
+    }
+    return new Blob([ab], {type:'audio/wav'});
+  }
+
+  scenarios.forEach((s) => {
+    const audio = new Audio(s.file);
+    audio.preload = 'metadata';
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const timeEl = document.getElementById('time-' + s.id);
+    const btnEl  = document.getElementById('btn-' + s.id);
+
+    fetch(s.file)
+      .then(r => r.ok ? r.arrayBuffer() : Promise.reject('HTTP '+r.status+' for '+s.file))
+      .then(b => ctx.decodeAudioData(b))
+      .then(buf => {
+        const dur = buf.duration;
+        const chL = buf.getChannelData(0);
+        const chR = buf.numberOfChannels > 1 ? buf.getChannelData(1) : chL;
+        const urlL = URL.createObjectURL(makeMonoWavBlob(chL, buf.sampleRate));
+        const urlR = URL.createObjectURL(makeMonoWavBlob(chR, buf.sampleRate));
+
+        const wsL = WaveSurfer.create({
+          container: '#wfL-'+s.id, url: urlL,
+          height: 64, waveColor: '#93c5fd', progressColor: '#2563eb',
+          cursorColor: '#1e3a8a', cursorWidth: 1.5,
+          barWidth: 2, barGap: 1, barRadius: 1, normalize: true,
+        });
+        const wsR = WaveSurfer.create({
+          container: '#wfR-'+s.id, url: urlR,
+          height: 64, waveColor: '#fca5a5', progressColor: '#dc2626',
+          cursorColor: '#7f1d1d', cursorWidth: 1.5,
+          barWidth: 2, barGap: 1, barRadius: 1, normalize: true,
+        });
+        players[s.id] = { audio, wsL, wsR, dur };
+
+        // 60fps cursor sync via requestAnimationFrame (timeupdate only fires ~4×/s).
+        let rafId = null;
+        const syncCursor = () => {
+          const t = audio.currentTime;
+          const f = dur > 0 ? t / dur : 0;
+          if (wsL.getDuration() > 0) wsL.setTime(f * wsL.getDuration());
+          if (wsR.getDuration() > 0) wsR.setTime(f * wsR.getDuration());
+          timeEl.textContent = fmt(t) + ' / ' + fmt(dur) + ' s';
+        };
+        const rafLoop = () => {
+          if (audio.paused || audio.ended) { rafId = null; return; }
+          syncCursor();
+          rafId = requestAnimationFrame(rafLoop);
+        };
+
+        audio.addEventListener('play', () => {
+          btnEl.textContent = '⏸ Pause';
+          if (!rafId) rafId = requestAnimationFrame(rafLoop);
+        });
+        audio.addEventListener('pause', () => {
+          btnEl.textContent = '▶ Play';
+          if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+          syncCursor();  // 暂停时 snap 到最终位置
+        });
+        audio.addEventListener('ended', () => {
+          btnEl.textContent = '▶ Play';
+          if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        });
+        audio.addEventListener('seeked', syncCursor);
+        audio.addEventListener('loadedmetadata', syncCursor);
+
+        const seek = (ws) => ws.on('interaction', (newT) => {
+          const d = ws.getDuration();
+          if (d > 0) audio.currentTime = (newT / d) * dur;
+        });
+        seek(wsL); seek(wsR);
+
+        timeEl.textContent = '0.00 / ' + fmt(dur) + ' s';
+        btnEl.disabled = false;
+        btnEl.textContent = '▶ Play';
+        btnEl.onclick = () => {
+          if (audio.paused) {
+            Object.keys(players).forEach(k => { if (k !== s.id) players[k].audio.pause(); });
+            audio.play();
+          } else { audio.pause(); }
+        };
+      })
+      .catch(e => {
+        console.error('Load failed for', s.id, e);
+        btnEl.textContent = '⚠ Error';
+        timeEl.textContent = String(e).slice(0, 60);
+      });
+  });
+})();
+</script>
+
+</body>
+</html>
